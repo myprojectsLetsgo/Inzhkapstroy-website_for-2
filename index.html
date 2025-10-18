@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -15,8 +18,13 @@
         }
 
         :root {
+<<<<<<< HEAD
             --primary: #366c60ff;
             --primary-dark: #1a5236ff;
+=======
+            --primary: #00a850;
+            --primary-dark: #008c46;
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
             --secondary: #2c3e50;
             --light: #f8f9fa;
             --dark: #343a40;
@@ -386,12 +394,17 @@
             .nav-container {
                 flex-direction: column;
             }
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
             nav ul {
                 margin-top: 15px;
                 flex-wrap: wrap;
                 justify-content: center;
             }
+<<<<<<< HEAD
 
             nav ul li {
                 margin: 5px 10px;
@@ -405,6 +418,21 @@
                 padding: 60px 20px;
             }
 
+=======
+            
+            nav ul li {
+                margin: 5px 10px;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            section {
+                padding: 60px 20px;
+            }
+            
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
             .video-controls {
                 flex-direction: column;
                 align-items: center;
@@ -621,6 +649,7 @@
         </div>
     </section>
 
+<<<<<<< HEAD
 <div class="contact-form">
     <h3>Отправить сообщение</h3>
     <!-- ИСПРАВЛЕННАЯ ССЫЛКА -->
@@ -651,6 +680,8 @@
 
 
 
+=======
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
 
 
 
@@ -693,7 +724,11 @@
                         <input type="hidden" name="_subject" value="✅ Новая заявка с сайта ИнжКапСтрой">
                         <input type="hidden" name="_captcha" value="false">
                         <input type="hidden" name="_template" value="table">
+<<<<<<< HEAD
 
+=======
+                        
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
                         <input type="text" name="name" placeholder="Ваше имя" required>
                         <input type="email" name="email" placeholder="Ваш email" required>
                         <input type="tel" name="phone" placeholder="Ваш телефон">
@@ -757,11 +792,19 @@
             e.preventDefault();
             const form = this;
             const successMessage = document.getElementById('formSuccess');
+<<<<<<< HEAD
 
             // Показываем сообщение об успехе
             successMessage.style.display = 'block';
             form.style.display = 'none';
 
+=======
+            
+            // Показываем сообщение об успехе
+            successMessage.style.display = 'block';
+            form.style.display = 'none';
+            
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
             // Отправляем форму
             fetch(form.action, {
                 method: 'POST',
@@ -773,7 +816,11 @@
             }).catch(error => {
                 console.error('Ошибка отправки формы:', error);
             });
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
             // Через 5 секунд возвращаем форму
             setTimeout(() => {
                 form.reset();
@@ -807,14 +854,22 @@
         const style = document.createElement('style');
         style.textContent = `
             .form-success {
+<<<<<<< HEAD
                 background: #0a6235ff;
+=======
+                background: #00a850;
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
                 color: white;
                 padding: 20px;
                 border-radius: 10px;
                 text-align: center;
                 margin-top: 20px;
                 font-weight: 600;
+<<<<<<< HEAD
                 border: 2px solid #0a4c2bff;
+=======
+                border: 2px solid #008c46;
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
             }
             .form-success i {
                 font-size: 24px;
@@ -822,4 +877,9 @@
                 display: block;
             }
         `;
+<<<<<<< HEAD
         document.head.appendChild(style);
+=======
+        document.head.appendChild(style);
+    </script>
+>>>>>>> 18338a30f637689d60e8170af11252884cb52468
