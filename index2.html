@@ -432,14 +432,6 @@
             border: none;
             border-radius: 5px;
             background: rgba(255,255,255,0.9);
-            font-family: inherit;
-            font-size: 1rem;
-        }
-
-        .contact-form input:focus,
-        .contact-form textarea:focus {
-            outline: 2px solid var(--primary);
-            background: white;
         }
 
         .contact-form button {
@@ -450,36 +442,10 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.3s;
-            font-size: 1rem;
-            font-weight: 600;
-            width: 100%;
         }
 
         .contact-form button:hover {
             background: var(--primary-dark);
-        }
-
-        .contact-form button:disabled {
-            background: var(--gray);
-            cursor: not-allowed;
-        }
-
-        .form-success {
-            background: #0a6235ff;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-            font-weight: 600;
-            border: 2px solid #0a4c2bff;
-            display: none;
-        }
-
-        .form-success i {
-            font-size: 24px;
-            margin-bottom: 10px;
-            display: block;
         }
 
         /* Footer */
@@ -724,7 +690,7 @@
             </div>
             
             <div class="bim-intro">
-                <h3>Основные преимущества BIM-технологии в работе ООО «<span class="company-name"><span class="accent-letter">И</span>нж<span class="accent-letter">К</span>ап<span class="accent-letter">С</span>трой</span>»</h3>
+                <h3>Основные преимущества BIM-технологий в работе ООО «<span class="company-name"><span class="accent-letter">И</span>нж<span class="accent-letter">К</span>ап<span class="accent-letter">С</span>трой</span>»</h3>
                 <p>Мы активно внедряем и используем BIM-технологии в наших проектах, что позволяет нам повысить эффективность, снизить затраты и обеспечить высочайшее качество на всех этапах проектирования и строительства.</p>
             </div>
             
@@ -798,14 +764,18 @@
                 </div>
                 <div class="contact-form">
                     <h3>Заявка на консультацию</h3>
-                    <form id="contactForm">
+                    <form action="https://formsubmit.co/el/peyade" method="POST" id="contactForm">
+                        <input type="hidden" name="_subject" value="✅ Новая заявка с сайта ИнжКапСтрой">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_template" value="table">
+
                         <input type="text" name="name" placeholder="Ваше имя" required>
                         <input type="email" name="email" placeholder="Ваш email" required>
                         <input type="tel" name="phone" placeholder="Ваш телефон">
                         <textarea name="message" placeholder="Опишите ваш проект или задайте вопрос..." rows="5" required></textarea>
                         <button type="submit">Получить бесплатную консультацию</button>
                     </form>
-                    <div class="form-success" id="formSuccess">
+                    <div class="form-success" id="formSuccess" style="display: none;">
                         <i class="fas fa-check-circle"></i> Спасибо! Ваша заявка принята. Мы свяжемся с вами в течение 2 часов.
                     </div>
                 </div>
@@ -824,7 +794,6 @@
         </div>
     </footer>
 
-    <!-- Основной JavaScript код -->
     <script>
         const video = document.getElementById('companyVideo');
         const videoContainer = document.getElementById('videoContainer');
@@ -876,6 +845,36 @@
             });
         });
 
+        // Form handling
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const successMessage = document.getElementById('formSuccess');
+
+            // Показываем сообщение об успехе
+            successMessage.style.display = 'block';
+            form.style.display = 'none';
+
+            // Отправляем форму
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form)
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Форма отправлена успешно');
+                }
+            }).catch(error => {
+                console.error('Ошибка отправки формы:', error);
+            });
+
+            // Через 5 секунд возвращаем форму
+            setTimeout(() => {
+                form.reset();
+                form.style.display = 'block';
+                successMessage.style.display = 'none';
+            }, 5000);
+        });
+
         // Add scroll effect to header
         window.addEventListener('scroll', function() {
             const header = document.querySelector('header');
@@ -898,9 +897,27 @@
         });
 
         observer.observe(video);
-    </script>
 
-    <!-- Подключение Telegram формы -->
-    <script src="telegram-form.js"></script>
+        // Добавляем стиль для сообщения об успехе
+        const style = document.createElement('style');
+        style.textContent = `
+            .form-success {
+                background: #0a6235ff;
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                margin-top: 20px;
+                font-weight: 600;
+                border: 2px solid #0a4c2bff;
+            }
+            .form-success i {
+                font-size: 24px;
+                margin-bottom: 10px;
+                display: block;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
