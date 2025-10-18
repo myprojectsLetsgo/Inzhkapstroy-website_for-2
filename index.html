@@ -514,6 +514,23 @@
         header.compact .logo h1 {
             font-size: 1.2rem;
         }
+
+        /* Стили для сообщения об успехе */
+        .form-success {
+            background: #0a6235ff;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 600;
+            border: 2px solid #0a4c2bff;
+        }
+        .form-success i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -763,22 +780,18 @@
                     </div>
                 </div>
                 <div class="contact-form">
-                    <h3>Заявка на консультацию</h3>
-                    <form action="https://formsubmit.co/el/peyade" method="POST" id="contactForm">
-                        <input type="hidden" name="_subject" value="✅ Новая заявка с сайта ИнжКапСтрой">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_template" value="table">
-
-                        <input type="text" name="name" placeholder="Ваше имя" required>
-                        <input type="email" name="email" placeholder="Ваш email" required>
-                        <input type="tel" name="phone" placeholder="Ваш телефон">
-                        <textarea name="message" placeholder="Опишите ваш проект или задайте вопрос..." rows="5" required></textarea>
-                        <button type="submit">Получить бесплатную консультацию</button>
-                    </form>
-                    <div class="form-success" id="formSuccess" style="display: none;">
-                        <i class="fas fa-check-circle"></i> Спасибо! Ваша заявка принята. Мы свяжемся с вами в течение 2 часов.
-                    </div>
-                </div>
+    <h3>Заявка в Telegram</h3>
+    <form id="telegramForm">
+        <input type="text" name="name" placeholder="Ваше имя" required>
+        <input type="tel" name="phone" placeholder="Ваш телефон" required>
+        <input type="email" name="email" placeholder="Ваш email">
+        <textarea name="message" placeholder="Опишите ваш проект или задайте вопрос..." rows="5" required></textarea>
+        <button type="submit">📨 Отправить заявку в Telegram</button>
+    </form>
+    <div class="form-success" id="formSuccess" style="display: none;">
+        <i class="fas fa-check-circle"></i> Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в течение 15 минут.
+    </div>
+</div>
             </div>
         </div>
     </section>
@@ -845,36 +858,6 @@
             });
         });
 
-        // Form handling
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = this;
-            const successMessage = document.getElementById('formSuccess');
-
-            // Показываем сообщение об успехе
-            successMessage.style.display = 'block';
-            form.style.display = 'none';
-
-            // Отправляем форму
-            fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form)
-            }).then(response => {
-                if (response.ok) {
-                    console.log('Форма отправлена успешно');
-                }
-            }).catch(error => {
-                console.error('Ошибка отправки формы:', error);
-            });
-
-            // Через 5 секунд возвращаем форму
-            setTimeout(() => {
-                form.reset();
-                form.style.display = 'block';
-                successMessage.style.display = 'none';
-            }, 5000);
-        });
-
         // Add scroll effect to header
         window.addEventListener('scroll', function() {
             const header = document.querySelector('header');
@@ -897,27 +880,84 @@
         });
 
         observer.observe(video);
-
-        // Добавляем стиль для сообщения об успехе
-        const style = document.createElement('style');
-        style.textContent = `
-            .form-success {
-                background: #0a6235ff;
-                color: white;
-                padding: 20px;
-                border-radius: 10px;
-                text-align: center;
-                margin-top: 20px;
-                font-weight: 600;
-                border: 2px solid #0a4c2bff;
-            }
-            .form-success i {
-                font-size: 24px;
-                margin-bottom: 10px;
-                display: block;
-            }
-        `;
-        document.head.appendChild(style);
     </script>
+    <script>
+// 🔧 НАСТРОЙКИ TELEGRAM
+const TELEGRAM_BOT_TOKEN = '8103044057:AAEcX6YtwgEcUkcyBDWeweYn7fS0nrsmPSI';
+const TELEGRAM_CHAT_ID = '1456413902';
+
+// 📨 Код отправки формы
+document.getElementById('telegramForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    submitBtn.innerHTML = '⏳ Отправка...';
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(this);
+    const timestamp = new Date().toLocaleString('ru-RU');
+    
+    const message = `📨 НОВАЯ ЗАЯВКА С САЙТА\n\n👤 Имя: ${formData.get('name')}\n📞 Телефон: ${formData.get('phone')}\n📧 Email: ${formData.get('email') || 'Не указан'}\n💬 Сообщение: ${formData.get('message')}\n⏰ Время: ${timestamp}`;
+    
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            document.getElementById('formSuccess').style.display = 'block';
+            document.getElementById('telegramForm').reset();
+            submitBtn.innerHTML = '✅ Отправлено!';
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 3000);
+        } else {
+            throw new Error('Ошибка отправки');
+        }
+    })
+    .catch(error => {
+        submitBtn.innerHTML = '❌ Ошибка';
+        setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }, 3000);
+    });
+});
+</script>
+
+<!-- Кнопка WhatsApp -->
+<a href="https://wa.me/79268797103?text=Здравствуйте! Хочу консультацию по проектированию" class="float-wa" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<style>
+.float-wa {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #25D366;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 60px;
+    font-size: 24px;
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    z-index: 1000;
+}
+.float-wa:hover {
+    transform: scale(1.1);
+}
+</style>
 </body>
 </html>

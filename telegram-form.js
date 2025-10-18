@@ -1,12 +1,9 @@
 // telegram-form.js
-// Настройки Telegram бота для формы обратной связи
-
 const TELEGRAM_CONFIG = {
     BOT_TOKEN: '8103044057:AAEcX6YtwgEcUkcyBDWeweYn7fS0nrsmPSI',
     CHAT_ID: '1456413902'
 };
 
-// Функция инициализации формы
 function initTelegramForm() {
     const contactForm = document.getElementById('contactForm');
     const formSuccess = document.getElementById('formSuccess');
@@ -16,17 +13,14 @@ function initTelegramForm() {
         return;
     }
 
-    // Обработка формы с отправкой в Telegram
     contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Показываем загрузку
         const submitBtn = contactForm.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
         submitBtn.disabled = true;
 
-        // Собираем данные формы
         const formData = new FormData(contactForm);
         const data = {
             name: formData.get('name'),
@@ -36,7 +30,6 @@ function initTelegramForm() {
             date: new Date().toLocaleString('ru-RU')
         };
 
-        // Формируем сообщение для Telegram
         const telegramMessage = `НОВАЯ ЗАЯВКА С САЙТА
 
 Компания: ООО "ИнжКапСтрой"
@@ -50,7 +43,7 @@ Email: ${data.email}
         try {
             console.log('Отправка в Telegram...');
             
-            // Отправляем сообщение в Telegram
+            // Пробуем отправить напрямую
             const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_CONFIG.BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: {
@@ -62,6 +55,11 @@ Email: ${data.email}
                 })
             });
 
+            // Если CORS ошибка, пробуем через proxy
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const result = await response.json();
             console.log('Ответ Telegram:', result);
             
@@ -70,7 +68,6 @@ Email: ${data.email}
                 contactForm.style.display = 'none';
                 formSuccess.style.display = 'block';
                 
-                // Сбрасываем форму через 5 секунд
                 setTimeout(() => {
                     contactForm.reset();
                     contactForm.style.display = 'block';
@@ -83,21 +80,67 @@ Email: ${data.email}
             }
         } catch (error) {
             console.error('Ошибка отправки:', error);
-            alert('Ошибка отправки. Позвоните нам: +7 (926) 879-71-03');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            
+            // Если CORS ошибка, пробуем альтернативные методы
+            if (error.name === 'TypeError' || error.message.includes('CORS') || error.message.includes('Network')) {
+                console.log('CORS ошибка, пробуем альтернативный метод...');
+                await tryAlternativeMethod(data, contactForm, formSuccess, submitBtn, originalText);
+            } else {
+                alert('Ошибка отправки. Позвоните нам: +7 (926) 879-71-03');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         }
     });
 
     console.log('Telegram форма инициализирована');
 }
 
+// Альтернативный метод через FormSubmit
+async function tryAlternativeMethod(data, contactForm, formSuccess, submitBtn, originalText) {
+    try {
+        // Используем FormSubmit как fallback
+        const formsubmitResponse = await fetch('https://formsubmit.co/ajax/info@inzhkapstroy.ru', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: data.name,
+                email: data.email,
+                phone: data.phone,
+                message: data.message,
+                _subject: '✅ Новая заявка с сайта ИнжКапСтрой',
+                _template: 'table'
+            })
+        });
+
+        if (formsubmitResponse.ok) {
+            // Успешная отправка через FormSubmit
+            contactForm.style.display = 'none';
+            formSuccess.style.display = 'block';
+            formSuccess.innerHTML = '<i class="fas fa-check-circle"></i> Спасибо! Заявка отправлена. Мы свяжемся с вами в течение 2 часов.';
+            
+            setTimeout(() => {
+                contactForm.reset();
+                contactForm.style.display = 'block';
+                formSuccess.style.display = 'none';
+                formSuccess.innerHTML = '<i class="fas fa-check-circle"></i> Спасибо! Ваша заявка принята. Мы свяжемся с вами в течение 2 часов.';
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 5000);
+        } else {
+            throw new Error('FormSubmit also failed');
+        }
+    } catch (fallbackError) {
+        console.error('Fallback также не сработал:', fallbackError);
+        alert('Не удалось отправить заявку автоматически. Позвоните нам: +7 (926) 879-71-03 или напишите на info@inzhkapstroy.ru');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
 // Инициализируем форму когда DOM загружен
 document.addEventListener('DOMContentLoaded', function() {
     initTelegramForm();
 });
-
-// Экспортируем для использования в других файлах
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { initTelegramForm, TELEGRAM_CONFIG };
-}
